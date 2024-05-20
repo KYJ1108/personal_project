@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동행_로그인</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<style>
+    body {
+        background-color: #f9f9f9;
+    }
+
+    .contentsWrap{
+        margin: 50px auto;
+        max-width: 400px;
+        border: none;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .loginWindow {
+        background-color: #fcfcfc;
+        padding: 10px auto;
+        border: 1px solid #dfdfdf;
+        border-radius: 3px;
+    }
+
+    .loginWindow input{
+        margin-bottom: 10px;
+        background-color: #f5f5f5;
+        height: 37px;
+        padding: 10px 10px;
+        box-sizing: border-box;
+        border: 1px solid #eaeaea;
+        border-radius: 4px;
+    }
+
+    .loginWindow input::placeholder{
+        font-size: 12px;
+        font-weight:100;
+    }
+
+    .loginWindow input:focus {
+        outline:none;
+        border: 1px solid #aaaaaa;
+        border-radius: 4px;
+    }
+
+    .ordinaryLogin {
+        height: 37px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+        border: 0px;
+        border-radius: 5px;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 37px;
+        text-decoration: none;
+    }
+
+    .unactivatedLoginColor {
+        background-color: #acd5e8;
+    }
+
+    .activatedLoginColor {
+        background-color: #00aeff;
+    }
+
+    .loginWindow * {
+        width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #instaLogo {
+        margin: 40px auto 30px;
+        max-width: 175px;
+    }
+
+    .inlineToBlock {
+        display: block;
+    }
+
+/*
+    .horizonAndOr {
+        margin:10% 0;
+        width:100%;
+        box-sizing: border-box;
+    }
+*/
+    .leftHr {
+        float:left;
+        width:35%;
+        box-sizing: border-box;
+    }
+
+    .or{
+        float:left;
+        width:17%;
+        margin:2px 5%;
+        font-size: 13px;
+        box-sizing: border-box;
+        color: #999999;
+        font-size: 14px;
+        font-weight: 700;
+        margin:0px 15px;
+    }
+
+    .rightHr {
+        float: right;
+        width:35%;
+        box-sizing: border-box;
+    }
+
+    .googleLogin {
+        margin-top: 10px;
+        margin-bottom:10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        height: 37px;
+        box-sizing: border-box;
+        border: 0px;
+        border-radius: 5px;
+        color: #00628f;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .kakaoLogin {
+        margin-top: 10px;
+        margin-bottom:10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        height: 37px;
+        box-sizing: border-box;
+        border: 0px;
+        border-radius: 5px;
+        color: #00628f;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .naverLogin {
+        margin-top: 10px;
+        margin-bottom:10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        height: 37px;
+        box-sizing: border-box;
+        border: 0px;
+        border-radius: 5px;
+        color: #00628f;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .Icon {
+        width:13px;
+    }
+
+
+    .haveAccount {
+        background-color: #fcfcfc;
+        margin-top: 10px;
+        padding: 15px;
+        border: 1px solid #dfdfdf;
+        border-radius: 3px;
+    }
+
+    .haveAccount p {
+        font-size: 14px;
+        font-weight: 300;
+        color: #333333;
+    }
+
+    .haveAccount p a{
+        font-weight: 600;
+        color: #248ae3;
+    }
+
+    .noneunderline {
+        text-decoration:none;
+    }
+</style>
+
+
+<body>
+
+<div class="contentsWrap">
+    <form th:action="@{/user/login}" method="post">
+        <div class="loginWindow">
+
+            <div th:if="${param.error}">
+                <div class="alert alert-danger">
+                    사용자ID 또는 비밀번호를 확인해 주세요.
+                </div>
+            </div>
+            <img src="/image/logo.png" alt="" id="instaLogo">
+            <input type="text" placeholder="아이디" name="username" class="inlineToBlock">
+            <input type="password" placeholder="비밀번호" name="password" class="inlineToBlock">
+
+            <button type="submit" class="inlineToBlock ordinaryLogin unactivatedLoginColor">로그인</button>
+
+            <div class="horizonAndOrWrap">
+                <hr class="leftHr">
+                <div class="or">또는</div>
+                <hr class="rightHr">
+                <a th:href="@{'https://accounts.google.com/o/oauth2/auth?client_id=' + ${clientId} + '&redirect_uri=' + ${redirectUri} + '&response_type=code&scope=openid%20profile%20email'}" class="noneunderline">
+                    <a th:href="@{/oauth2/authorization/google}" class="inlineToBlock googleLogin">
+                        <img src="/image/google.png" alt="" class="Icon">
+                        Google로 로그인
+                    </a>
+                </a>
+                <a th:href="@{'https://accounts.kakao.com/o/oauth2/auth?client_id=' + ${clientId} + '&redirect_uri=' + ${redirectUri} + '&response_type=code&scope=openid%20profile%20email'}" class="noneunderline">
+                    <a th:href="@{/oauth2/authorization/kakao}" class="inlineToBlock kakaoLogin">
+                        <img src="/image/kakao.png" alt="" class="Icon">
+                        Kakao로 로그인
+                    </a>
+                </a>
+                <a th:href="@{'https://accounts.naver.com/o/oauth2/auth?client_id=' + ${clientId} + '&redirect_uri=' + ${redirectUri} + '&response_type=code&scope=openid%20profile%20email'}" class="noneunderline">
+                    <a th:href="@{/oauth2/authorization/naver}" class="inlineToBlock naverLogin">
+                        <img src="/image/naver.png" alt="" class="Icon">
+                        Naver로 로그인
+                    </a>
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <div class="haveAccount">
+        <p>계정이 없으신가요?
+            <a th:href="@{/user/signup}" class="noneunderline">가입하기</a>
+        </p>
+        <p>비밀번호를 찾으시나요?
+            <a th:href="@{/user/findPw}" class="noneunderline">비밀번호 찾기</a>
+        </p>
+    </div>
+</div>
+
+<script src="in.js"></script>
+</body>
+</html>

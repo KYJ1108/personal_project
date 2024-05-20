@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 변경</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+         .profile-photo {
+            margin: 20px auto; /* 이미지와 파일 선택을 가운데로 정렬 */
+            width: 100px;
+            height: 100px;
+        }
+        .profile-photo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-group input[type="file"] {
+            cursor: pointer;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 10px; /* 저장 버튼과 프로필 변경 취소 버튼 간의 간격 조정 */
+            display: flex; /* 버튼을 가로로 정렬 */
+            justify-content: center; /* 가운데 정렬 */
+        }
+        .button-container button, .button-container a.btn {
+            flex: 1; /* 동일한 크기로 설정 */
+            padding: 10px 20px;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            text-decoration: none; /* 프로필 변경 취소 버튼에 적용 */
+        }
+        .button-container button:hover, .button-container a.btn:hover {
+            background-color: #000; /* 마우스 호버시 배경색 검은색으로 변경 */
+            color: #fff; /* 글씨색 흰색으로 변경 */
+        }
+
+        .btn-cen{
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none; /* 밑줄 없애기 */
+        }
+
+        .btn-cen:hover {
+            background-color: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>프로필 변경</h2>
+    <form th:action="@{/user/modifyProfile}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <div class="profile-photo">
+                <img id="img" th:src="@{|${user.url != null ? user.url : '/img/user.png'}|}" alt="프로필 사진">
+            </div>
+            <input type="file" class="form-control-file" id="file" name="file" onchange="previewImage(this)">
+        </div>
+
+        <div class="form-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" th:value="${user.nickname}">
+        </div>
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" class="form-control" id="email" name="email" th:value="${user.email}">
+        </div>
+        <div class="button-container">
+            <a class="btn btn-cen" th:href="@{/user/profile}">프로필 변경 취소</a>
+            <button type="button" th:onclick="location.href='/user/modifyPassword';" class="btn btn-cen">비밀번호 변경</button>
+            <button type="submit" class="btn btn-cen">저장</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

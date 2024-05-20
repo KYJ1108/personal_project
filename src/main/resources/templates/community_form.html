@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동행</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #E3CEF6;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            width: 50px;
+            height: auto;
+        }
+        .nav-item {
+            margin-right: 20px;
+        }
+        li {
+            display: inline;
+            margin-right: 15px;
+        }
+        .nav-link {
+            color: black;
+            text-decoration: none;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        .post {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 300px;
+        }
+        .post img {
+            width: 100%;
+            height: auto;
+        }
+        footer {
+            background-color: #E3CEF6;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/community/list"><img src="/image/logo.png" alt="로고 이미지" class="logo"></a>
+    <nav>
+        <ul>
+            <li class="nav-item"><a class="nav-link" href="/user/profile">프로필</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <!-- 서버에서 전달받은 게시물 목록을 반복하며 HTML 요소를 생성 -->
+    <div th:each="post : ${communities}" class="post">
+        <p th:text="${post.user.nickname}"></p> <!-- 사용자 닉네임 출력 -->
+        <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
+        <p th:text="${post.postDescription}"></p>
+    </div>
+</div>
+
+<footer>
+    <a th:href="@{/community/add}">게시물 작성</a>
+</footer>
+</body>
+</html>

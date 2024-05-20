@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+    <style>
+        form {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h2>게시글 작성</h2>
+<form th:action="@{|/community/add|}" method="post" enctype="multipart/form-data">
+    <label for="postImage">게시글 이미지:</label>
+    <input type="file" id="postImage" name="postImage" multiple><br><br>
+
+    <label for="postDescription">게시글 내용:</label>
+    <textarea id="postDescription" name="postDescription" rows="4" cols="50"></textarea><br><br>
+
+    <button type="submit">등록</button>
+</form>
+</body>
+</html>
