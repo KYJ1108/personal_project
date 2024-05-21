@@ -1,6 +1,9 @@
 package com.example.personal_project.user;
 
 import com.example.personal_project.DataNotFoundException;
+import com.example.personal_project.community.Community;
+import com.example.personal_project.community.CommunityController;
+import com.example.personal_project.community.CommunityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ResourceLoader resourceLoader;
+    private final CommunityRepository communityRepository;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -130,42 +136,4 @@ public class UserService {
             userRepository.save(newUser);
         }
     }
-
-//    public void socialLogin(String code, String registrationId) {
-//        String accessToken = getAccessToken(code, registrationId);
-//        JsonNode userResourceNode = getUserResource(accessToken, registrationId);
-//        System.out.println("userResourceNode = " + userResourceNode);
-//
-//        String id = userResourceNode.get("id").asText();
-//        String email = userResourceNode.get("email").asText();
-//        String nickname = userResourceNode.get("name").asText();
-//        System.out.println("id = " + id);
-//        System.out.println("email = " + email);
-//        System.out.println("nickname = " + nickname);
-//    }
-//
-//    private String getAccessToken(String authorizationCode, String registrationId) {
-//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//        params.add("code", authorizationCode);
-//        params.add("client_id", clientId);
-//        params.add("client_secret", clientSecret);
-//        params.add("redirect_uri", redirectUri);
-//        params.add("grant_type", "authorization_code");
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        HttpEntity entity = new HttpEntity(params, headers);
-//
-//        ResponseEntity<JsonNode> responseNode = restTemplate.exchange(tokenUri, HttpMethod.POST, entity, JsonNode.class);
-//        JsonNode accessTokenNode = responseNode.getBody();
-//        return accessTokenNode.get("access_token").asText();
-//    }
-//
-//    private JsonNode getUserResource(String accessToken, String registrationId) {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + accessToken);
-//        HttpEntity entity = new HttpEntity(headers);
-//        return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
-//    }
 }

@@ -7,15 +7,17 @@ import java.util.Collection;
 import java.util.List;
 
 public class UserDetail implements UserDetails {
-
     private final User user;
+    private final List<? extends GrantedAuthority> authorities;
 
-    public UserDetail(User user){this.user =user;}
-
+    public UserDetail(User user, List<? extends GrantedAuthority> authorities) {
+        this.user = user;
+        this.authorities = authorities;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return authorities;
     }
 
     @Override
@@ -24,7 +26,9 @@ public class UserDetail implements UserDetails {
     }
 
     @Override
-    public String getUsername() {return user.getLoginId();}
+    public String getUsername() {
+        return user.getLoginId();
+    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -44,5 +48,9 @@ public class UserDetail implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

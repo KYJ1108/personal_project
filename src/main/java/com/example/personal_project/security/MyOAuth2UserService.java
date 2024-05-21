@@ -1,8 +1,12 @@
 package com.example.personal_project.security;
 
 import com.example.personal_project.user.User;
+import com.example.personal_project.user.UserDetail;
 import com.example.personal_project.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -10,6 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -17,45 +22,56 @@ import java.util.Map;
 public class MyOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
-   @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest)throws OAuth2AuthenticationException{
-       OAuth2User user = super.loadUser(userRequest);
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User oauth2User = super.loadUser(userRequest);
 
-       String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
-       MySocialUser mySocialUser;
+        MySocialUser mySocialUser;
 
-       switch (registrationId){
-           case "google" -> mySocialUser = googleService(user);
-           case "kakao" -> mySocialUser = kakaoService(user);
-           case "naver" -> mySocialUser = naverService(user);
-           default -> throw new IllegalStateException("Unexpected value: "+registrationId);
-       }
+        switch (registrationId) {
+            case "google" -> mySocialUser = googleService(oauth2User);
+            case "kakao" -> mySocialUser = kakaoService(oauth2User);
+            case "naver" -> mySocialUser = naverService(oauth2User);
+            default -> throw new IllegalStateException("Unexpected value: " + registrationId);
+        }
 
-       User u = userRepository.findByLoginId(mySocialUser.getSub()).orElse(null);
+        User user = userRepository.findByLoginId(mySocialUser.getSub()).orElse(null);
 
-       if (u == null){
-           u = new User();
-           u.setLoginId(mySocialUser.getSub());
-           u.setPassword(mySocialUser.getPass());
-           u.setNickname(mySocialUser.getName());
-           u.setEmail(mySocialUser.getEmail());
-           u.setCreateDate(LocalDateTime.now());
+        if (user == null) {
+            user = new User();
+            user.setLoginId(mySocialUser.getSub());
+            user.setPassword(mySocialUser.getPass());
+            user.setNickname(mySocialUser.getName());
+            user.setEmail(mySocialUser.getEmail());
+            user.setCreateDate(LocalDateTime.now());
 
-           userRepository.save(u);
-       }
-       return super.loadUser(userRequest);
-   }
+            userRepository.save(user);
+        }
 
+        // 권한 설정
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("USER");
+        List<SimpleGrantedAuthority> authorities = List.of(authority);
 
-   public MySocialUser googleService(OAuth2User user){
-       String sub = user.getAttribute("sub");
-       String pass = "";
-       String name = user.getAttribute("name");
-       String email = user.getAttribute("email");
+        // UserDetail 객체 생성
+        UserDetail userDetail = new UserDetail(user, authorities);
 
-       return new MySocialUser(sub, pass, name, email);
-   }
+        // 인증 토큰을 생성하여 SecurityContextHolder에 설정
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return oauth2User;
+    }
+
+    public MySocialUser googleService(OAuth2User user) {
+        String sub = user.getAttribute("sub");
+        String pass = "";
+        String name = user.getAttribute("name");
+        String email = user.getAttribute("email");
+
+        return new MySocialUser(sub, pass, name, email);
+    }
 
    public MySocialUser kakaoService(OAuth2User user){
        String sub = user.getAttribute("id").toString();

@@ -27,6 +27,6 @@ public class MyUserDetailService implements UserDetailsService {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("USER");
         List<SimpleGrantedAuthority> authorities = List.of(authority); // 권한이 여러개일 경우 List.of()로 추가 가능
 
-        return new UserDetail(user); // 3가지 필수 인증 정보. 아이디, 비밀번호, 권한
+        return new UserDetail(user, authorities); // 3가지 필수 인증 정보. 아이디, 비밀번호, 권한
     }
 }
