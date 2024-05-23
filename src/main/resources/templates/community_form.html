@@ -41,16 +41,44 @@
             margin-top: 50px;
             flex-direction: column; /* 세로로 배치 */
             align-items: center; /* 가운데 정렬 */
+            padding-bottom: 50px; /* 하단 여백 추가 */
         }
         .post {
             margin: 10px;
             padding: 10px;
             border: 1px solid #ccc;
             width: 50%; /* 원하는 너비 조정 */
+            position: relative; /* 댓글 아이콘을 위한 상대 위치 설정 */
         }
         .post img {
             width: 100%;
             height: auto;
+        }
+        .comment-icon {
+            cursor: pointer;
+            font-size: 24px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+        .comment-section {
+            display: none;
+            position: absolute;
+            top: 40px; /* 댓글 섹션을 더 아래로 위치시킵니다. */
+            right: 0;
+            width: calc(100% - 20px);
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 10;
+        }
+        .comment {
+            border-bottom: 1px solid #eee;
+            padding: 5px 0;
+        }
+        .comment-input {
+            width: calc(100% - 20px);
+            padding: 5px;
         }
         footer {
             background-color: #E3CEF6;
@@ -75,16 +103,65 @@
 <div class="container">
     <!-- 서버에서 전달받은 게시물 목록을 반복하며 HTML 요소를 생성 -->
     <div th:each="post : ${communities}" class="post">
-<!--        <img id="img" th:src="@{|${user.url != null ? user.url : '/pimg/user.png'}|}" style="border-radius:50%" /> &lt;!&ndash; 프로필 사진 추가 &ndash;&gt;-->
+        <!-- 사용자 프로필 사진 표시 -->
+        <img th:src="@{|${post.user.url != null ? post.user.url : '/image/default-profile.png'}|}" alt="프로필 사진">
         <p th:text="${post.user.nickname}"></p> <!-- 사용자 닉네임 출력 -->
         <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
+        <span class="comment-icon" onclick="toggleComments(this)">💬</span> <!-- 댓글 이모티콘 -->
         <p th:text="${post.postDescription}"></p>
         <p th:text="${#dates.format(#dates.create(post.postDateTime.year, post.postDateTime.monthValue, post.postDateTime.dayOfMonth, post.postDateTime.hour, post.postDateTime.minute), 'yyyy-MM-dd HH:mm')}"></p><!-- 업로드 날짜 출력 -->
+        <div class="comment-section">
+            <div class="comment" th:each="comment : ${post.comments}">
+                <p th:text="${comment.user.nickname} + ': ' + ${comment.text}"></p>
+            </div>
+            <textarea class="comment-input" placeholder="댓글을 입력하세요..."></textarea>
+            <button onclick="addComment(this, ${post.id})">댓글 작성</button>
+        </div>
     </div>
 </div>
 
 <footer>
     <a th:href="@{/community/add}">게시물 작성</a>
 </footer>
-</body>
-</html>
+
+<script>
+    function toggleComments(element) {
+        const commentSection = element.parentElement.querySelector('.comment-section');
+        commentSection.style.display = commentSection.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function addComment(button, postId) {
+        const commentSection = button.parentElement;
+        const textarea = commentSection.querySelector('.comment-input');
+        const commentText = textarea.value;
+
+        if (commentText.trim() === '') {
+            alert('댓글을 입력하세요.');
+            return;
+        }
+
+        // AJAX 호출을 통해 댓글을 서버에 저장하고, 성공 시 화면에 댓글을 추가합니다.
+        const formData = new FormData();
+        formData.append('postId', postId);
+        formData.append('text', commentText);
+
+        fetch('/comment/add', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const newComment = document.createElement('div');
+                newComment.className = 'comment';
+                newComment.textContent = data.userNickname + ': ' + commentText;
+                commentSection.insertBefore(newComment, textarea);
+
+                textarea.value = ''; // 텍스트 영역 비우기
+            } else {
+                alert('댓글 추가에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error adding comment:', error);
+            alert('댓글 추가에 실패했습니다

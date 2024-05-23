@@ -1,12 +1,14 @@
 package com.example.personal_project.community;
 
 
+import com.example.personal_project.comment.Comment;
+import com.example.personal_project.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import com.example.personal_project.user.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,4 +44,8 @@ public class Community {
         this.postDescription = postDescription;
         this.postDateTime = postDateTime;
     }
+
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
 }
