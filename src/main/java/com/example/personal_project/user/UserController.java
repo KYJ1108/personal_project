@@ -1,6 +1,7 @@
 package com.example.personal_project.user;
 
 
+import com.example.personal_project.community.Community;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ import java.security.Principal;
 public class UserController {
 
     private final UserService userService;
-//    private final SendEmailService sendEmailService;
+    private final SendEmailService sendEmailService;
     private final PasswordEncoder passwordEncoder;
     private static final String UPLOAD_DIR = "./uploads"; // 이미지 업로드 디렉토리
 
@@ -61,54 +63,54 @@ public class UserController {
         return "login_form";
     }
 
-//    @GetMapping("findPw")
-//    public String findPw(UserPwRequestDto userPwRequestDto){
-//        return "findPassword_form";
-//    }
-//
-//    @PostMapping(value = "/findPw")
-//    public String pwFind(@Valid UserPwRequestDto userPwRequestDto, BindingResult bindingResult, org.springframework.ui.Model model) {
-//        if(bindingResult.hasErrors()){
-//            model.addAttribute("error","아이디와 이메일을 확인해주세요.");
-//            return "findPassword_form";
-//        }
-//
-//        String tempPassword = this.sendEmailService.getTempPassword();
-//        User user = this.userService.getUser(userPwRequestDto.getUserName());
-//        user.setPassword(passwordEncoder.encode(tempPassword));
-//        this.userService.save(user);
-//        this.sendEmailService.mailSend(user,"임시비밀번호 발송","임시 비밀번호는" +tempPassword+" 입니다.");
-//
-//        return "redirect:/user/login"; // 비밀번호 재설정이 성공했음을 알리는 페이지로 이동
-//    }
+    @GetMapping("findPw")
+    public String findPw(UserPwRequestDto userPwRequestDto){
+        return "findPassword_form";
+    }
 
-//    @GetMapping("/modifyPassword")
-//    public String modifyPw(){
-//        return "modifyPassword_form";
-//    }
-//
-//    @PostMapping("/modifyPassword")
-//    public String changePassword(org.springframework.ui.Model model, Principal principal,
-//                                 @RequestParam("currentPassword")String currentPassword,
-//                                 @RequestParam("newPassword")String newPassword,
-//                                 @RequestParam("confirmPassword")String confirmPassword){
-//        if (!newPassword.equals(confirmPassword)){
-////             비밀번호가 일치하지 않음.
-//            model.addAttribute("error", "새로운 비밀번호와 새로운 비밀번호 확인이 일치하지 않습니다.");
-//            return "modifyPassword_form";
-//        }
-//        try {
-//            // 현재 사용자의 아이디를 얻어옴
-//            String userName = principal.getName();
-//            // 사용자의 비밀번호 변경을 userService를 통해 처리
-//            userService.changePassword(userName, currentPassword, newPassword);
-//            return "redirect:/user/profile";
-//        } catch (CustomException e){
-//            // 비밀번호 변경 중에 예외가 발생한 경우 에러 메시지를 받아와서 비밀번호 변경 페이지로
-//            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
-//            return "modifyPassword_form";
-//        }
-//    }
+    @PostMapping(value = "/findPw")
+    public String pwFind(@Valid UserPwRequestDto userPwRequestDto, BindingResult bindingResult, org.springframework.ui.Model model) {
+        if(bindingResult.hasErrors()){
+            model.addAttribute("error","아이디와 이메일을 확인해주세요.");
+            return "findPassword_form";
+        }
+
+        String tempPassword = this.sendEmailService.getTempPassword();
+        User user = this.userService.getUser(userPwRequestDto.getLoginId());
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        this.userService.save(user);
+        this.sendEmailService.mailSend(user,"임시비밀번호 발송","임시 비밀번호는" +tempPassword+" 입니다.");
+
+        return "redirect:/user/login"; // 비밀번호 재설정이 성공했음을 알리는 페이지로 이동
+    }
+
+    @GetMapping("/modifyPassword")
+    public String modifyPw(){
+        return "modifyPassword_form";
+    }
+
+    @PostMapping("/modifyPassword")
+    public String changePassword(org.springframework.ui.Model model, Principal principal,
+                                 @RequestParam("currentPassword")String currentPassword,
+                                 @RequestParam("newPassword")String newPassword,
+                                 @RequestParam("confirmPassword")String confirmPassword){
+        if (!newPassword.equals(confirmPassword)){
+//             비밀번호가 일치하지 않음.
+            model.addAttribute("error", "새로운 비밀번호와 새로운 비밀번호 확인이 일치하지 않습니다.");
+            return "modifyPassword_form";
+        }
+        try {
+            // 현재 사용자의 아이디를 얻어옴
+            String userName = principal.getName();
+            // 사용자의 비밀번호 변경을 userService를 통해 처리
+            userService.changePassword(userName, currentPassword, newPassword);
+            return "redirect:/user/profile";
+        } catch (CustomException e){
+            // 비밀번호 변경 중에 예외가 발생한 경우 에러 메시지를 받아와서 비밀번호 변경 페이지로
+            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+            return "modifyPassword_form";
+        }
+    }
 
     @GetMapping("/profile")
     public String userProfile(Principal principal, Model model){
@@ -126,7 +128,8 @@ public class UserController {
         model.addAttribute("user", user);
 
         // 사용자가 작성간 게시물 등의 정보를 가져옴
-//        List<Community> communities = userService.getCommunityByUserId(user.getId());
+        List<Community> userPosts = userService.getUserPosts(user.getLoginId());
+        model.addAttribute("userPosts", userPosts);
 
         return "profile_form";
     }
@@ -172,6 +175,4 @@ public class UserController {
             return "modifyProfile_form";
         }
     }
-
-
 }

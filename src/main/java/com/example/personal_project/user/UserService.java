@@ -4,6 +4,7 @@ import com.example.personal_project.DataNotFoundException;
 import com.example.personal_project.community.Community;
 import com.example.personal_project.community.CommunityController;
 import com.example.personal_project.community.CommunityRepository;
+import com.example.personal_project.community.CommunityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ResourceLoader resourceLoader;
     private final CommunityRepository communityRepository;
+    private final CommunityService communityService;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -135,5 +137,16 @@ public class UserService {
             newUser.setEmail(email);
             userRepository.save(newUser);
         }
+    }
+
+    // 사용자가 작성한 게시물 가져오기
+    public List<Community> getUserPosts(String loginId){
+        User user = userRepository.findByLoginId(loginId).orElse(null);
+        if (user!= null){
+            return communityRepository.findByUser(user);
+        }
+        return Collections.emptyList();
+
+//        return communityService.getUserPosts(loginId);
     }
 }

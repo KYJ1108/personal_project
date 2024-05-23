@@ -96,7 +96,7 @@
     <form th:action="@{/user/modifyProfile}" method="post" enctype="multipart/form-data">
         <div class="form-group">
             <div class="profile-photo">
-                <img id="img" th:src="@{|${user.url != null ? user.url : '/img/user.png'}|}" alt="프로필 사진">
+                <img id="img" th:src="@{|${user.url != null ? user.url : '/pimg/user.png'}|}" alt="프로필 사진">
             </div>
             <input type="file" class="form-control-file" id="file" name="file" onchange="previewImage(this)">
         </div>

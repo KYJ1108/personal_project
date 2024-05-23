@@ -143,12 +143,11 @@
 </header>
 <div class="container">
     <div class="profile-photo">
-        <img id="img" th:src="@{|${user.url != null ? user.url : '/img/user.png'}|}" style="border-radius:50%" />
+        <img id="img" th:src="@{|${user.url != null ? user.url : '/pimg/user.png'}|}" style="border-radius:50%" />
     </div>
     <div class="user-info">
         <p><strong>아이디:</strong> <span th:text="${user.loginId}"></span></p>
         <p><strong>닉네임:</strong> <span th:text="${user.nickname}"></span></p>
-<!--        <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>-->
     </div>
     <div class="button-container">
         <a th:href="@{/user/modifyProfile}">프로필 수정</a>

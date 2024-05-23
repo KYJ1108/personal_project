@@ -39,12 +39,14 @@
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 50px;
+            flex-direction: column; /* 세로로 배치 */
+            align-items: center; /* 가운데 정렬 */
         }
         .post {
             margin: 10px;
             padding: 10px;
             border: 1px solid #ccc;
-            width: 300px;
+            width: 50%; /* 원하는 너비 조정 */
         }
         .post img {
             width: 100%;
@@ -73,9 +75,11 @@
 <div class="container">
     <!-- 서버에서 전달받은 게시물 목록을 반복하며 HTML 요소를 생성 -->
     <div th:each="post : ${communities}" class="post">
+<!--        <img id="img" th:src="@{|${user.url != null ? user.url : '/pimg/user.png'}|}" style="border-radius:50%" /> &lt;!&ndash; 프로필 사진 추가 &ndash;&gt;-->
         <p th:text="${post.user.nickname}"></p> <!-- 사용자 닉네임 출력 -->
         <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
         <p th:text="${post.postDescription}"></p>
+        <p th:text="${#dates.format(#dates.create(post.postDateTime.year, post.postDateTime.monthValue, post.postDateTime.dayOfMonth, post.postDateTime.hour, post.postDateTime.minute), 'yyyy-MM-dd HH:mm')}"></p><!-- 업로드 날짜 출력 -->
     </div>
 </div>
 

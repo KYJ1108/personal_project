@@ -123,4 +123,8 @@ public class CommunityService {
             }
         }
     }
+
+//    public List<Community> getUserPosts(String loginId) {
+//        return communityRepository.findByAuthorId(loginId);
+//    }
 }

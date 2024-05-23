@@ -21,7 +21,10 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                        .requestMatchers("/password-reset").permitAll()
+                        .requestMatchers("/forgot-password").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+                .csrf(csrf -> csrf.disable()) // 테스트 용도로만 CSRF 보호 비활성화
                 .formLogin((formLogin) -> formLogin
                         .loginPage("/user/login")
                         .defaultSuccessUrl("/community/list"))
@@ -31,8 +34,7 @@ public class SecurityConfig {
                 .logout((logout) -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
                         .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true))
-        ;
+                        .invalidateHttpSession(true));
         return http.build();
     }
     @Bean
