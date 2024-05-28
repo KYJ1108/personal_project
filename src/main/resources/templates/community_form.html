@@ -43,13 +43,14 @@
         }
         .post-wrapper {
             display: flex;
-            width: 60%;
+            width: 50%;
             margin-bottom: 20px;
             border: 1px solid #ccc;
         }
         .post-container {
             display: flex;
             width: 100%;
+            height:600px;
         }
         .post {
             padding: 10px;
@@ -58,15 +59,21 @@
         }
         .post img {
             width: 100%;
-            height: auto;
+            height: 60%;
+        }
+        .comment-wrapper {
+            overflow-y: auto; /* 스크롤을 사용하여 넘칠 경우 표시 */
+            padding: 5px 0; /* 댓글 목록의 위아래 패딩 추가 */
         }
         .comment-section {
-            display: block; /* 댓글 섹션을 항상 표시 */
-            width: 30%;
+            display: flex; /* 댓글 섹션을 항상 표시 */
+            flex-direction: column;
+            width: 50%;
             background-color: #f9f9f9;
             border-left: 1px solid #ccc;
             padding: 10px;
             box-sizing: border-box;
+            height: 100%; /* 부모 요소의 높이를 100%로 설정 */
         }
         .comment {
             border-bottom: 1px solid #eee;
@@ -85,6 +92,7 @@
             bottom: 0;
             width: 100%;
         }
+
     </style>
 </head>
 <body>
@@ -109,14 +117,23 @@
                 <p th:text="${#temporals.format(post.postDateTime, 'yyyy-MM-dd HH:mm')}"></p><!-- 업로드 날짜 출력 -->
             </div>
             <div class="comment-section">
-                <div class="comment" th:each="comment : ${post.comments}">
-                    <p th:text="${comment.user.loginId} + ': ' + ${comment.text}"></p>
-                </div>
-                <form action="">
-                    <input type="hidden" th:value="${post.id}">
-                    <textarea class="comment-input" placeholder="댓글을 입력하세요..."></textarea>
-                    <button onclick="addComment(this, ${post.id})">댓글 작성</button>
+                <form th:action="@{|/comment/create/${post.id}|}" th:object="${commentForm}" method="post">
+                    <textarea class="comment-input" th:field="*{content}" placeholder="댓글을 입력하세요..."></textarea>
+                    <button type="submit">댓글 작성</button>
                 </form>
+                <div class="comment-wrapper">
+                    <div class="comment-list" th:each="comment : ${post.comments}">
+                        <p>
+                            <span th:text="${comment.user.nickname}"></span> <!-- 닉네임 -->
+<!--                            <span th:text="${#temporals.format(comment.postDateTime, 'yyyy-MM-dd HH:mm')}"></span> &lt;!&ndash; 쓴지 얼마나 되었는지 &ndash;&gt;-->
+<!--                            <span th:text="${#temporals.format(comment.postDateTime, 'yyyy-MM-dd')}"></span> &lt;!&ndash; 쓴지 몇 일 전인지 &ndash;&gt;-->
+                            <br>
+                            <span th:text="${comment.content}"></span> <!-- 댓글 내용 -->
+                            <br>
+<!--                            <a href="#">답글달기</a> &lt;!&ndash; 답글달기 링크 &ndash;&gt;-->
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

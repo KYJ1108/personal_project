@@ -5,6 +5,7 @@ import com.example.personal_project.community.CommunityService;
 import com.example.personal_project.user.User;
 import com.example.personal_project.user.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,10 +23,11 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/comment")
+@RequiredArgsConstructor
 public class CommentController {
-    private CommentService commentService;
-    private CommunityService communityService;
-    private UserService userService;
+    private final CommentService commentService;
+    private final CommunityService communityService;
+    private final UserService userService;
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create/{id}")
@@ -33,12 +35,10 @@ public class CommentController {
                                BindingResult bindingResult, Principal principal) {
         Community community = this.communityService.getCommunity(id);
         User user = this.userService.getUser(principal.getName());
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("question", community);
-            return "question_detail";
-        }
-        Comment comment = this.commentService.create(community, commentForm.getContent(), user);
-        return String.format("redirect:/community/detail/%s#comment_%s", comment.getCommunity().getId(),comment.getId());
+        Comment comment = commentService.create(community,commentForm.getContent(),user);
+        commentService.save(comment);
+
+        return "redirect:/community/list";
     }
 
     @PreAuthorize("isAuthenticated()")

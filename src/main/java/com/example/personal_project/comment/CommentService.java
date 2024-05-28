@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
     public Comment create (Community community, String content, User user){
         Comment comment = new Comment();
@@ -67,6 +67,10 @@ public class CommentService {
 
     public List<Comment> getAnswersByUserId(Long userId) {
         return commentRepository.findByUserId(userId);
+    }
+
+    public void save(Comment comment) {
+        commentRepository.save(comment);
     }
 
 //    public List<Comment> getCommentByCommunity(Community community){

@@ -1,5 +1,6 @@
 package com.example.personal_project.community;
 
+import com.example.personal_project.comment.CommentForm;
 import com.example.personal_project.user.User;
 import com.example.personal_project.user.UserDetail;
 import com.example.personal_project.user.UserService;
@@ -24,7 +25,7 @@ public class CommunityController {
 
      //모든 게시물 조회
     @GetMapping("/list")
-    public String list(Model model) {
+    public String list(Model model, CommentForm commentForm) {
         List<Community> communities = communityService.getAllPosts(); // 게시물 목록을 가져오는 메서드
         model.addAttribute("communities", communities); // 모델에 게시물 목록 추가
         return "community_form"; // 컨트롤러에서 반환하는 뷰 이름
