@@ -14,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -88,19 +90,28 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public String temp_url(MultipartFile file){
-        if(!file.isEmpty()){
+    public String temp_url(MultipartFile file) {
+        if (!file.isEmpty()) {
             try {
-                String path = resourceLoader.getResource("classpath:/static").getFile().getPath();
-                File fileFolder = new File("/img");
-                if(!fileFolder.exists()){
-                    fileFolder.mkdirs();
-                }
-                String filePath = "/img/" + UUID.randomUUID().toString()+"."+ file.getContentType().split("/")[1];
-                file.transferTo(Paths.get(path+filePath));
-                return filePath;
-            }catch (IOException ignored){
+                // 파일을 저장할 절대 경로 설정
+                String uploadDir = "src/main/resources/static/pimg";
 
+                // 디렉토리 생성 (이미 존재하면 생성하지 않음)
+                File directory = new File(uploadDir);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
+                // 파일명 생성
+                String fileName = UUID.randomUUID().toString() + "." + file.getContentType().split("/")[1];
+                String filePath = uploadDir + "/" + fileName;
+
+                // 파일 저장
+                Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+
+                return "/pimg/" + fileName;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return null;
@@ -149,4 +160,10 @@ public class UserService {
 
 //        return communityService.getUserPosts(loginId);
     }
+
+    public User findByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid loginId: " + loginId));
+    }
+
 }

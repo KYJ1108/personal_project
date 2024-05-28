@@ -22,7 +22,7 @@ public class Comment {
 
     // 댓글 내용
     @Column(columnDefinition = "TEXT")
-    private String text;
+    private String content;
 
     // 작성 시간
     private LocalDateTime createDate;

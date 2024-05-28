@@ -98,7 +98,7 @@
             <div class="profile-photo">
                 <img id="img" th:src="@{|${user.url != null ? user.url : '/pimg/user.png'}|}" alt="프로필 사진">
             </div>
-            <input type="file" class="form-control-file" id="file" name="file" onchange="previewImage(this)">
+            <input type="file" id="file" name="file" accept="image/*" onchange="previewImage(this)">
         </div>
 
         <div class="form-group">

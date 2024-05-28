@@ -19,6 +19,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,8 +30,9 @@ public class CommunityService {
     private final UserRepository userRepository;
 
     public List<Community> getAllPosts() {
-        return communityRepository.findAll();
+        return communityRepository.findAllByOrderByPostDateTimeDesc();  // 최신순 정렬된 게시물 가져오기
     }
+
 
     // 모든 게시물 조회
     public Page<Community> getList(int page, String kw) {
@@ -124,7 +126,9 @@ public class CommunityService {
         }
     }
 
-//    public List<Community> getUserPosts(String loginId) {
-//        return communityRepository.findByAuthorId(loginId);
-//    }
+    public Community getCommunity(int id) {
+        Optional<Community> community = communityRepository.findById(id);
+        return community.orElseThrow(() -> new IllegalArgumentException("Invalid community ID: " + id));
+    }
+
 }

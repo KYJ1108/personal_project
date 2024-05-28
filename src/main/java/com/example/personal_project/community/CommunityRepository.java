@@ -13,5 +13,7 @@ public interface CommunityRepository extends JpaRepository<Community, Integer> {
 
     List<Community> findByUser(User user);
 
+    List<Community> findAllByOrderByPostDateTimeDesc();  // 최신순 정렬
+
 //    List<Community> findByAuthorId(String loginId);
 }

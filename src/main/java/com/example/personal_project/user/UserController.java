@@ -2,6 +2,7 @@ package com.example.personal_project.user;
 
 
 import com.example.personal_project.community.Community;
+import com.example.personal_project.community.CommunityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,13 +10,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
 
@@ -27,6 +35,7 @@ public class UserController {
     private final UserService userService;
     private final SendEmailService sendEmailService;
     private final PasswordEncoder passwordEncoder;
+    private final CommunityService communityService;
     private static final String UPLOAD_DIR = "./uploads"; // 이미지 업로드 디렉토리
 
     @GetMapping("/signup")
@@ -141,7 +150,9 @@ public class UserController {
 
         // userService를 사용하여 사용자 정보를 가져옴
         User user = userService.getUser(userId);
+        String nickname = user.getNickname();
         model.addAttribute("user", user);
+        model.addAttribute("nickname",nickname);
 
         return "modifyProfile_form";
     }
@@ -151,6 +162,13 @@ public class UserController {
                                 @RequestParam("nickname")String nickname,
                                 @RequestParam("email")String email,
                                 @RequestParam("file") MultipartFile file) {
+
+        // Principal 객체가 null인지 확인
+        if(principal == null) {
+            // 처리할 방법을 결정하거나 예외를 처리합니다.
+            return "redirect:/login"; // 로그인 페이지로 리다이렉트 또는 오류 처리
+        }
+
         // 현재 로그인한 사용자의 아이디를 가져옴
         User user = userService.getUser(principal.getName());
         String userId = principal.getName();
@@ -158,11 +176,12 @@ public class UserController {
 
         // 파일이 업로드된 경우에만 처리
         if (!file.isEmpty()){
-            if (file.getContentType() != null && file.getContentType().startsWith("img")){
+            if (file.getContentType() != null && file.getContentType().startsWith("pimg")){
                 //이미지를 서버에 저장하고 url을 얻음
                 url = userService.temp_url(file);
+                //사용자 정보에 프로필 사진 URL 저장
+                userService.saveimage(user, url);
             }
-            userService.saveimage(user, url);
         }
 
         // 사용자 정보 업데이트

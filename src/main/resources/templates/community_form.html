@@ -36,41 +36,37 @@
         }
         .container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             margin-top: 50px;
-            flex-direction: column; /* 세로로 배치 */
-            align-items: center; /* 가운데 정렬 */
-            padding-bottom: 50px; /* 하단 여백 추가 */
+            padding-bottom: 50px;
+        }
+        .post-wrapper {
+            display: flex;
+            width: 60%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+        }
+        .post-container {
+            display: flex;
+            width: 100%;
         }
         .post {
-            margin: 10px;
             padding: 10px;
-            border: 1px solid #ccc;
-            width: 50%; /* 원하는 너비 조정 */
-            position: relative; /* 댓글 아이콘을 위한 상대 위치 설정 */
+            width: 70%;
+            position: relative;
         }
         .post img {
             width: 100%;
             height: auto;
         }
-        .comment-icon {
-            cursor: pointer;
-            font-size: 24px;
-            position: absolute;
-            right: 10px;
-            top: 10px;
-        }
         .comment-section {
-            display: none;
-            position: absolute;
-            top: 40px; /* 댓글 섹션을 더 아래로 위치시킵니다. */
-            right: 0;
-            width: calc(100% - 20px);
+            display: block; /* 댓글 섹션을 항상 표시 */
+            width: 30%;
             background-color: #f9f9f9;
-            border: 1px solid #ccc;
+            border-left: 1px solid #ccc;
             padding: 10px;
-            z-index: 10;
+            box-sizing: border-box;
         }
         .comment {
             border-bottom: 1px solid #eee;
@@ -102,34 +98,35 @@
 </header>
 <div class="container">
     <!-- 서버에서 전달받은 게시물 목록을 반복하며 HTML 요소를 생성 -->
-    <div th:each="post : ${communities}" class="post">
-        <!-- 사용자 프로필 사진 표시 -->
-        <img th:src="@{|${post.user.url != null ? post.user.url : '/image/default-profile.png'}|}" alt="프로필 사진">
-        <p th:text="${post.user.nickname}"></p> <!-- 사용자 닉네임 출력 -->
-        <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
-        <span class="comment-icon" onclick="toggleComments(this)">💬</span> <!-- 댓글 이모티콘 -->
-        <p th:text="${post.postDescription}"></p>
-        <p th:text="${#dates.format(#dates.create(post.postDateTime.year, post.postDateTime.monthValue, post.postDateTime.dayOfMonth, post.postDateTime.hour, post.postDateTime.minute), 'yyyy-MM-dd HH:mm')}"></p><!-- 업로드 날짜 출력 -->
-        <div class="comment-section">
-            <div class="comment" th:each="comment : ${post.comments}">
-                <p th:text="${comment.user.nickname} + ': ' + ${comment.text}"></p>
+    <div th:each="post : ${communities}" class="post-wrapper">
+        <div class="post-container">
+            <div class="post">
+                <!-- 사용자 프로필 사진 표시 -->
+                <img th:src="@{|${post.user.url != null ? post.user.url : '/image/default-profile.png'}|}" alt="프로필 사진">
+                <p th:text="${post.user.loginId}"></p> <!-- 사용자 loginId 출력 -->
+                <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
+                <p th:text="${post.postDescription}"></p>
+                <p th:text="${#temporals.format(post.postDateTime, 'yyyy-MM-dd HH:mm')}"></p><!-- 업로드 날짜 출력 -->
             </div>
-            <textarea class="comment-input" placeholder="댓글을 입력하세요..."></textarea>
-            <button onclick="addComment(this, ${post.id})">댓글 작성</button>
+            <div class="comment-section">
+                <div class="comment" th:each="comment : ${post.comments}">
+                    <p th:text="${comment.user.loginId} + ': ' + ${comment.text}"></p>
+                </div>
+                <form action="">
+                    <input type="hidden" th:value="${post.id}">
+                    <textarea class="comment-input" placeholder="댓글을 입력하세요..."></textarea>
+                    <button onclick="addComment(this, ${post.id})">댓글 작성</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <footer>
-    <a th:href="@{/community/add}">게시물 작성</a>
+    <a th:href="@{/community/add}"><img src="/image/add.png" alt="게시물 작성" style="width: 30px; height: 30px;"></a>
 </footer>
 
 <script>
-    function toggleComments(element) {
-        const commentSection = element.parentElement.querySelector('.comment-section');
-        commentSection.style.display = commentSection.style.display === 'block' ? 'none' : 'block';
-    }
-
     function addComment(button, postId) {
         const commentSection = button.parentElement;
         const textarea = commentSection.querySelector('.comment-input');
@@ -154,7 +151,7 @@
             if (data.success) {
                 const newComment = document.createElement('div');
                 newComment.className = 'comment';
-                newComment.textContent = data.userNickname + ': ' + commentText;
+                newComment.textContent = data.userLoginId + ': ' + commentText;
                 commentSection.insertBefore(newComment, textarea);
 
                 textarea.value = ''; // 텍스트 영역 비우기
@@ -164,4 +161,9 @@
         })
         .catch(error => {
             console.error('Error adding comment:', error);
-            alert('댓글 추가에 실패했습니다
+            alert('댓글 추가에 실패했습니다.');
+        });
+    }
+</script>
+</body>
+</html>
