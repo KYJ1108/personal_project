@@ -73,19 +73,15 @@ public class UserService {
         }
     }
 
-    public void updateProfile(String loginId, String nickname, String email) throws CustomException {
+    public void updateProfile(User user, String nickname, String email,String Url) throws CustomException {
         // 데이터베이스에서 사용자를 검색
-        Optional<User> userOptional = userRepository.findByLoginId(loginId);
 
-        if (!userOptional.isPresent()){
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다");
-        }
+
 
         // 사용자 정보를 업데이트
-        User user = userOptional.get();
         user.setNickname(nickname);
         user.setEmail(email);
-
+        user.setUrl(Url);
         // 업데이트된 사용자를 데이터베이스에 다시 저장
         userRepository.save(user);
     }
@@ -126,11 +122,10 @@ public class UserService {
                     oldFile.delete();
                 }
             }
-
             user.setUrl(url);
             userRepository.save(user);
-        }catch (IOException ignored){
-
+        }catch (IOException e){
+            e.printStackTrace();
         }
     }
 
@@ -166,4 +161,19 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid loginId: " + loginId));
     }
 
+    public String temp_save(MultipartFile file) {
+        if (!file.isEmpty())
+            try {
+                String path = resourceLoader.getResource("classpath:/static").getFile().getPath();
+                File fileFolder = new File("/image");
+                if (!fileFolder.exists())
+                    fileFolder.mkdirs();
+                String filePath = "/pimag/" + UUID.randomUUID().toString() + "." + file.getContentType().split("/")[1];
+                file.transferTo(Paths.get(path + filePath));
+                return filePath;
+            } catch (IOException ignored) {
+
+            }
+        return null;
+    }
 }

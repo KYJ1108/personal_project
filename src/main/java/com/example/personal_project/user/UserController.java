@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
@@ -161,7 +162,8 @@ public class UserController {
     public String changeProfile(Model model, Principal principal,
                                 @RequestParam("nickname")String nickname,
                                 @RequestParam("email")String email,
-                                @RequestParam("file") MultipartFile file) {
+                                @RequestParam("file") MultipartFile file,
+                                @RequestParam(value = "url",defaultValue = "")String url) {
 
         // Principal 객체가 null인지 확인
         if(principal == null) {
@@ -170,28 +172,92 @@ public class UserController {
         }
 
         // 현재 로그인한 사용자의 아이디를 가져옴
-        User user = userService.getUser(principal.getName());
+//        User user = userService.getUser(principal.getName());
         String userId = principal.getName();
-        String url = user.getUrl();
+        User user = userService.getUser(userId);
+//        String url = user.getUrl();
 
         // 파일이 업로드된 경우에만 처리
-        if (!file.isEmpty()){
-            if (file.getContentType() != null && file.getContentType().startsWith("pimg")){
-                //이미지를 서버에 저장하고 url을 얻음
-                url = userService.temp_url(file);
-                //사용자 정보에 프로필 사진 URL 저장
-                userService.saveimage(user, url);
+        if (!file.isEmpty()) {
+            if (file.getContentType() != null && file.getContentType().startsWith("image")) {
+                // 이미지를 서버에 저장하고 url을 얻음
+                String tempUrl = userService.temp_url(file);
+                if (tempUrl != null) {
+                    url = tempUrl;
+                    // 사용자 정보에 프로필 사진 URL 저장
+                    userService.saveimage(user, url);
+                } else {
+                    model.addAttribute("error", "파일 업로드에 실패했습니다.");
+                    return "modifyProfile_form";
+                }
             }
+        }
+//        if (!file.isEmpty()){
+//            if (file.getContentType() != null && file.getContentType().startsWith("pimg")){
+//                //이미지를 서버에 저장하고 url을 얻음
+//                url = userService.temp_url(file);
+//                //사용자 정보에 프로필 사진 URL 저장
+//                userService.saveimage(user, url);
+//            }
+//        }
+
+//        String url = null;
+//        if(file.getContentType().contains("image"))
+//            url = userService.temp_save(file);
+
+        // URL이 비어 있지 않으면 저장
+        if (!url.isBlank()) {
+            userService.saveimage(user, url);
         }
 
         // 사용자 정보 업데이트
         try{
-            userService.updateProfile(userId, nickname, email);
+            userService.updateProfile(user, nickname, email,url);
             return "redirect:/user/profile";
         } catch (CustomException e){
             e.printStackTrace();
             model.addAttribute("error", "프로필 업데이트에 실패했습니다.");
             return "modifyProfile_form";
         }
+    }
+
+    @PostMapping("/imageform")
+    public String imageform(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes, @RequestParam("text") String text) {
+        String url = null;
+
+        try {
+            // 파일 타입이 이미지인지 확인
+            if (file != null && file.getContentType() != null && file.getContentType().contains("image")) {
+                // userService.temp_save(file) 메서드를 호출하여 URL을 얻음
+                url = userService.temp_save(file);
+
+                // URL이 null이면 예외를 발생시켜 처리하도록 함
+                if (url == null) {
+                    throw new IllegalStateException("Failed to save image, URL is null.");
+                }
+            } else {
+                throw new IllegalArgumentException("File is not an image.");
+            }
+        } catch (Exception e) {
+            // 예외가 발생하면 기본값을 설정하거나 에러 메시지를 추가
+            redirectAttributes.addFlashAttribute("errorMessage", "Image upload failed: " + e.getMessage());
+            // 기본 URL 설정 (예: placeholder 이미지 URL)
+            return "redirect:/user/profile";
+        }
+
+        // URL 및 텍스트를 리다이렉트 속성에 추가
+        redirectAttributes.addFlashAttribute("url", url);
+        redirectAttributes.addFlashAttribute("text", text);
+
+        return "redirect:/user/profile";
+    }
+
+    @PostMapping("/imagesaveform")
+    public String imagesaveform(Principal principal, @RequestParam(value = "url",defaultValue = "")String url){
+        if(url.isBlank())
+            return "redirect:/user/profile";
+        User user = userService.getUser(principal.getName());
+        userService.saveimage(user,url);
+        return "redirect:/user/profile";
     }
 }

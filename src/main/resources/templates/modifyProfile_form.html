@@ -94,6 +94,10 @@
 <div class="container">
     <h2>프로필 변경</h2>
     <form th:action="@{/user/modifyProfile}" method="post" enctype="multipart/form-data">
+<!--        <form id="image_form" th:action="@{|/user/imageform|}" method="post" enctype="multipart/form-data">-->
+<!--            <input id="file" type="file"  name="file" value="이미지 등록">-->
+<!--            <input type="text" name="text" id="text" th:value="${text}"/>-->
+<!--        </form>-->
         <div class="form-group">
             <div class="profile-photo">
                 <img id="img" th:src="@{|${user.url != null ? user.url : '/pimg/user.png'}|}" alt="프로필 사진">
@@ -116,5 +120,27 @@
         </div>
     </form>
 </div>
+
+<script>
+<!--    const profile_img = document.getElementById('profile_img');-->
+<!--    profile_img.addEventListener('click', ()=>{-->
+<!--        document.getElementById('file').click();-->
+<!--    });-->
+<!--    const file = document.getElementById('file');-->
+<!--    file.addEventListener('change', ()=>{-->
+<!--        document.getElementById('image_form').submit();-->
+<!--    });-->
+
+function previewImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('img').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+</script>
 </body>
 </html>

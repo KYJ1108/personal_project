@@ -50,16 +50,27 @@
         .post-container {
             display: flex;
             width: 100%;
-            height:600px;
+            height: 600px;
         }
         .post {
             padding: 10px;
             width: 70%;
             position: relative;
         }
-        .post img {
+        .post-img {
             width: 100%;
             height: 60%;
+        }
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
         .comment-wrapper {
             overflow-y: auto; /* 스크롤을 사용하여 넘칠 경우 표시 */
@@ -92,7 +103,6 @@
             bottom: 0;
             width: 100%;
         }
-
     </style>
 </head>
 <body>
@@ -107,12 +117,15 @@
 <div class="container">
     <!-- 서버에서 전달받은 게시물 목록을 반복하며 HTML 요소를 생성 -->
     <div th:each="post : ${communities}" class="post-wrapper">
+        <input type="hidden" th:value="${post.id}" id="postId">
         <div class="post-container">
             <div class="post">
-                <!-- 사용자 프로필 사진 표시 -->
-                <img th:src="@{|${post.user.url != null ? post.user.url : '/image/default-profile.png'}|}" alt="프로필 사진">
-                <p th:text="${post.user.loginId}"></p> <!-- 사용자 loginId 출력 -->
-                <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
+                <div class="profile-container">
+                    <!-- 사용자 프로필 사진 표시 -->
+                    <img th:src="@{|${post.user.url != null ? post.user.url : '/pimg/user.png'}|}" alt="프로필 사진" class="profile-img">
+                    <p th:text="${post.user.nickname}"></p> <!-- 사용자 nickname 출력 -->
+                </div>
+                <img th:src="@{|${post.postPhoto}|}" alt="Post Image" class="post-img">
                 <p th:text="${post.postDescription}"></p>
                 <p th:text="${#temporals.format(post.postDateTime, 'yyyy-MM-dd HH:mm')}"></p><!-- 업로드 날짜 출력 -->
             </div>
@@ -125,12 +138,9 @@
                     <div class="comment-list" th:each="comment : ${post.comments}">
                         <p>
                             <span th:text="${comment.user.nickname}"></span> <!-- 닉네임 -->
-<!--                            <span th:text="${#temporals.format(comment.postDateTime, 'yyyy-MM-dd HH:mm')}"></span> &lt;!&ndash; 쓴지 얼마나 되었는지 &ndash;&gt;-->
-<!--                            <span th:text="${#temporals.format(comment.postDateTime, 'yyyy-MM-dd')}"></span> &lt;!&ndash; 쓴지 몇 일 전인지 &ndash;&gt;-->
                             <br>
                             <span th:text="${comment.content}"></span> <!-- 댓글 내용 -->
                             <br>
-<!--                            <a href="#">답글달기</a> &lt;!&ndash; 답글달기 링크 &ndash;&gt;-->
                         </p>
                     </div>
                 </div>
@@ -142,45 +152,5 @@
 <footer>
     <a th:href="@{/community/add}"><img src="/image/add.png" alt="게시물 작성" style="width: 30px; height: 30px;"></a>
 </footer>
-
-<script>
-    function addComment(button, postId) {
-        const commentSection = button.parentElement;
-        const textarea = commentSection.querySelector('.comment-input');
-        const commentText = textarea.value;
-
-        if (commentText.trim() === '') {
-            alert('댓글을 입력하세요.');
-            return;
-        }
-
-        // AJAX 호출을 통해 댓글을 서버에 저장하고, 성공 시 화면에 댓글을 추가합니다.
-        const formData = new FormData();
-        formData.append('postId', postId);
-        formData.append('text', commentText);
-
-        fetch('/comment/add', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const newComment = document.createElement('div');
-                newComment.className = 'comment';
-                newComment.textContent = data.userLoginId + ': ' + commentText;
-                commentSection.insertBefore(newComment, textarea);
-
-                textarea.value = ''; // 텍스트 영역 비우기
-            } else {
-                alert('댓글 추가에 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error adding comment:', error);
-            alert('댓글 추가에 실패했습니다.');
-        });
-    }
-</script>
 </body>
 </html>
