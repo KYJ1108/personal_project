@@ -172,10 +172,9 @@ public class UserController {
         }
 
         // 현재 로그인한 사용자의 아이디를 가져옴
-//        User user = userService.getUser(principal.getName());
         String userId = principal.getName();
         User user = userService.getUser(userId);
-//        String url = user.getUrl();
+        String userImage = user.getUrl();
 
         // 파일이 업로드된 경우에만 처리
         if (!file.isEmpty()) {
@@ -190,35 +189,32 @@ public class UserController {
                     model.addAttribute("error", "파일 업로드에 실패했습니다.");
                     return "modifyProfile_form";
                 }
+                try{
+                    userService.updateProfile(user, nickname, email,url);
+                    return "redirect:/user/profile";
+                } catch (CustomException e){
+                    e.printStackTrace();
+                    model.addAttribute("error", "프로필 업데이트에 실패했습니다.");
+                    return "modifyProfile_form";
+                }
+            }
+        }else{
+            try{
+                userService.updateProfile(user, nickname, email,userImage);
+                return "redirect:/user/profile";
+            } catch (CustomException e){
+                e.printStackTrace();
+                model.addAttribute("error", "프로필 업데이트에 실패했습니다.");
+                return "modifyProfile_form";
             }
         }
-//        if (!file.isEmpty()){
-//            if (file.getContentType() != null && file.getContentType().startsWith("pimg")){
-//                //이미지를 서버에 저장하고 url을 얻음
-//                url = userService.temp_url(file);
-//                //사용자 정보에 프로필 사진 URL 저장
-//                userService.saveimage(user, url);
-//            }
-//        }
-
-//        String url = null;
-//        if(file.getContentType().contains("image"))
-//            url = userService.temp_save(file);
-
         // URL이 비어 있지 않으면 저장
         if (!url.isBlank()) {
             userService.saveimage(user, url);
         }
 
         // 사용자 정보 업데이트
-        try{
-            userService.updateProfile(user, nickname, email,url);
-            return "redirect:/user/profile";
-        } catch (CustomException e){
-            e.printStackTrace();
-            model.addAttribute("error", "프로필 업데이트에 실패했습니다.");
-            return "modifyProfile_form";
-        }
+        return "redirect:/user/profile";
     }
 
     @PostMapping("/imageform")
@@ -249,15 +245,6 @@ public class UserController {
         redirectAttributes.addFlashAttribute("url", url);
         redirectAttributes.addFlashAttribute("text", text);
 
-        return "redirect:/user/profile";
-    }
-
-    @PostMapping("/imagesaveform")
-    public String imagesaveform(Principal principal, @RequestParam(value = "url",defaultValue = "")String url){
-        if(url.isBlank())
-            return "redirect:/user/profile";
-        User user = userService.getUser(principal.getName());
-        userService.saveimage(user,url);
         return "redirect:/user/profile";
     }
 }

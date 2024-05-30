@@ -3,11 +3,13 @@ package com.example.personal_project.community;
 import com.example.personal_project.user.User;
 import com.example.personal_project.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.codehaus.groovy.util.StringUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -131,4 +133,55 @@ public class CommunityService {
         return community.orElseThrow(() -> new IllegalArgumentException("Invalid community ID: " + id));
     }
 
+    // 해당 id에 해당하는 게시물 가져오기
+    public Community getCommunityById(int id) {
+        return communityRepository.findById(id).orElse(null);
+    }
+
+    // 게시물 수정 처리
+    public void modifyCommunity(int id, MultipartFile postImage, String postDescription) {
+        // 해당 id로 게시물을 찾음.
+        Community community = communityRepository.findById(id).orElse(null);
+
+        // 게시물이 존재하는 경우에만 수정을 진행
+        if (community != null) {
+            try {
+                // 이미지를 서버에 저장하고, 저장된 경로를 데이터베이스에 저장
+                String imagePath = saveImageToServer(postImage);
+                community.setPostPhoto(imagePath);
+
+                // 게시물 내용도 수정
+                community.setPostDescription(postDescription);
+
+                // 수정된 게시물을 저장
+                communityRepository.save(community);
+            } catch (IOException e) {
+                // 이미지 저장 실패 시 예외 처리
+                e.printStackTrace();
+                // 예외 처리에 따른 로직 추가
+            }
+        }
+    }
+
+    // 서버에 이미지를 저장하는 메서드
+    private String saveImageToServer(MultipartFile imageFile) throws IOException{
+        // 업로드할 디렉토리 경로
+        String uploadDir = "src/main/resources/static/img";
+
+        // 업로드할 파일 이름
+        String fileName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+
+        // 업로드할 디렉토리가 없으면 생성
+//        File uploadPath = new File(uploadDir);
+//        if (!uploadPath.exists()) {
+//            uploadPath.mkdirs();
+//        }
+
+        // 파일을 서버에 저장
+        Path filePath = Paths.get(uploadDir+File.separator+fileName);
+        Files.copy(imageFile.getInputStream(), filePath);
+
+        // 저장된 파일의 경로를 문자열로 반환
+        return uploadDir + "/" + fileName;
+    }
 }

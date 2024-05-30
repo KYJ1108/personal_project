@@ -51,17 +51,19 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         // 권한 설정
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("USER");
-        List<SimpleGrantedAuthority> authorities = List.of(authority);
-
-        // UserDetail 객체 생성
-        UserDetail userDetail = new UserDetail(user, authorities);
+//        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("USER");
+//        List<SimpleGrantedAuthority> authorities = List.of(authority);
+//
+//        // UserDetail 객체 생성
+//        UserDetail userDetail = new UserDetail(user, authorities);
 
         // 인증 토큰을 생성하여 SecurityContextHolder에 설정
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail, null, authorities);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return oauth2User;
+        MyOauth2User myOauth2User = new MyOauth2User();
+        myOauth2User.setName(mySocialUser.getSub());
+        return myOauth2User;
     }
 
     public MySocialUser googleService(OAuth2User user) {

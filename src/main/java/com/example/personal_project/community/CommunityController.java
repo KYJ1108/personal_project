@@ -31,21 +31,6 @@ public class CommunityController {
         return "community_form"; // 컨트롤러에서 반환하는 뷰 이름
     }
 
-//    public String list(Model model, @RequestParam(value = "page", defaultValue = "0")int page,
-//                @RequestParam(value = "kw", defaultValue = "") String kw) {
-//        Page<Community> paging = this.communityService.getList(page, kw);
-//        model.addAttribute("paging", paging);
-//        model.addAttribute("kw", kw);
-//
-//        return "community_form";
-//    }
-
-    // 작성 페이지로 이동
-//    @GetMapping("/community/write")
-//    public String showWritePage() {
-//        return "communityPost_form";
-//    }
-
     // 게시물 작성 페이지로 이동
     @GetMapping("/add")
     public String add(){
@@ -77,6 +62,34 @@ public class CommunityController {
         }
         return "redirect:/community/list"; // 리스트 페이지로 리다이렉
     }
+
+    // 게시물 수정 페이지로 이동
+    @GetMapping("/modify/{id}")
+    public String modify(@PathVariable("id") int id, Model model) {
+        // 수정할 게시물의 정보를 가져옵니다.
+        Community community = communityService.getCommunityById(id);
+
+        // 게시물 정보를 모델에 추가하여 뷰에 전달합니다.
+        model.addAttribute("community", community);
+
+        return "modifyCommunity_form"; // 수정 페이지로 이동
+    }
+
+    // 게시물 수정 처리
+    @PostMapping("/modify/{id}")
+    public String modify(@PathVariable("id") int id,
+                       @RequestParam("postImage") MultipartFile postImage,
+                       @RequestParam("postDescription") String postDescription,
+                       RedirectAttributes redirectAttributes) {
+        // 게시물을 수정합니다.
+        communityService.modifyCommunity(id, postImage, postDescription);
+
+        // 수정 성공 메시지를 전달합니다.
+        redirectAttributes.addFlashAttribute("successMessage", "게시물이 성공적으로 수정되었습니다.");
+
+        return "redirect:/community/list"; // 리스트 페이지로 리다이렉트
+    }
+
 
     // 게시물 삭제
     @PostMapping("/delete/{id}")

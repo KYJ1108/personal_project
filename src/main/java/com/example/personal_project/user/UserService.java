@@ -152,8 +152,6 @@ public class UserService {
             return communityRepository.findByUser(user);
         }
         return Collections.emptyList();
-
-//        return communityService.getUserPosts(loginId);
     }
 
     public User findByLoginId(String loginId) {

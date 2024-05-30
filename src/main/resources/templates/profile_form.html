@@ -158,7 +158,6 @@
         <!-- 서버에서 전달받은 게시물 목록을 반복하며 HTML 요소를 생성 -->
         <div th:each="post : ${communities}" class="post">
             <img th:src="@{|${post.postPhoto}|}" alt="Post Image">
-            <p th:text="${post.postDescription}">Post Description</p>
         </div>
     </div>
 

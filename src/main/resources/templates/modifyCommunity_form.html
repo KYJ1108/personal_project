@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>게시글 작성</title>
+    <title>게시물 수정</title>
     <style>
         form {
             width: 50%;
@@ -11,9 +11,6 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             background-color: #f9f9f9;
-        }
-        h2 {
-            text-align: center; /* h2 요소를 가운데 정렬합니다. */
         }
         label {
             display: block;
@@ -39,15 +36,18 @@
     </style>
 </head>
 <body>
-<h2>게시글 작성</h2>
-<form th:action="@{|/community/add|}" method="post" enctype="multipart/form-data">
-    <label for="postImage">게시글 이미지:</label>
+<h2>게시물 수정</h2>
+<form th:action="@{|/community/modify/${community.id}|}" method="post" enctype="multipart/form-data">
+    <!-- 수정할 게시물의 ID를 hidden으로 전달합니다. -->
+    <input type="hidden" id="postId" name="postId" th:value="${postId}">
+
+    <label for="postImage">게시물 이미지:</label>
     <input type="file" id="postImage" name="postImage" multiple><br><br>
 
-    <label for="postDescription">게시글 내용:</label>
-    <textarea id="postDescription" name="postDescription" rows="4" cols="50"></textarea><br><br>
+    <label for="postDescription">게시물 내용:</label>
+    <textarea id="postDescription" name="postDescription" rows="4" cols="50" th:text="${postDescription}"></textarea><br><br>
 
-    <button type="submit">등록</button>
+    <button type="submit">수정 완료</button>
 </form>
 </body>
 </html>

@@ -65,12 +65,48 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
+            border: 2px solid #E3CEF6;
             object-fit: cover;
         }
         .profile-container {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             margin-bottom: 10px;
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+        }
+        .profile-info p {
+            margin-left: 10px;
+            margin-bottom: 0;
+        }
+        .more-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .more-options {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            right: 10px;
+            top: 50px;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .more-options button {
+            background: none;
+            border: none;
+            padding: 10px;
+            text-align: left;
+            cursor: pointer;
+        }
+        .more-btn img {
+            width: 20px;
         }
         .comment-wrapper {
             overflow-y: auto; /* 스크롤을 사용하여 넘칠 경우 표시 */
@@ -121,9 +157,20 @@
         <div class="post-container">
             <div class="post">
                 <div class="profile-container">
-                    <!-- 사용자 프로필 사진 표시 -->
-                    <img th:src="@{|${post.user.url != null ? post.user.url : '/pimg/user.png'}|}" alt="프로필 사진" class="profile-img">
-                    <p th:text="${post.user.nickname}"></p> <!-- 사용자 nickname 출력 -->
+                    <div class="profile-info">
+                        <!-- 사용자 프로필 사진 표시 -->
+                        <img th:src="@{|${post.user.url != null ? post.user.url : '/pimg/user.png'}|}" alt="프로필 사진" class="profile-img">
+                        <p th:text="${post.user.nickname}"></p> <!-- 사용자 nickname 출력 -->
+                    </div>
+                    <button class="more-btn" onclick="toggleMoreOptions(this)">
+                        <img src="/image/plus.png" alt="더보기">
+                    </button>
+                    <div class="more-options">
+                        <a th:href="@{|/community/modify/${post.id}|}" class="btn" >수정</a>
+                        <form th:action="@{|/community/delete/${post.id}|}" method="post">
+                            <input type="submit" value="삭제" class="btn">
+                        </form>
+                    </div>
                 </div>
                 <img th:src="@{|${post.postPhoto}|}" alt="Post Image" class="post-img">
                 <p th:text="${post.postDescription}"></p>
@@ -152,5 +199,12 @@
 <footer>
     <a th:href="@{/community/add}"><img src="/image/add.png" alt="게시물 작성" style="width: 30px; height: 30px;"></a>
 </footer>
+
+<script>
+    function toggleMoreOptions(btn) {
+        var options = btn.nextElementSibling;
+        options.style.display = (options.style.display === "none") ? "flex" : "none";
+    }
+</script>
 </body>
 </html>
