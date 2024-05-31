@@ -144,6 +144,12 @@
 <body>
 <header>
     <a href="/community/list"><img src="/image/logo.png" alt="로고 이미지" class="logo"></a>
+    <nav class="nav-item">
+        <ul>
+            <li class="nav-item"><a class="nav-link" href="/veterinary">동물병원</a></li>
+            <li class="nav-item"><a class="nav-link" href="/animal-shelter">유기견 센터</a></li>
+        </ul>
+    </nav>
     <nav>
         <ul>
             <li class="nav-item"><a class="nav-link" href="/user/profile">프로필</a></li>
@@ -162,14 +168,16 @@
                         <img th:src="@{|${post.user.url != null ? post.user.url : '/pimg/user.png'}|}" alt="프로필 사진" class="profile-img">
                         <p th:text="${post.user.nickname}"></p> <!-- 사용자 nickname 출력 -->
                     </div>
-                    <button class="more-btn" onclick="toggleMoreOptions(this)">
-                        <img src="/image/plus.png" alt="더보기">
-                    </button>
-                    <div class="more-options">
-                        <a th:href="@{|/community/modify/${post.id}|}" class="btn" >수정</a>
-                        <form th:action="@{|/community/delete/${post.id}|}" method="post">
-                            <input type="submit" value="삭제" class="btn">
-                        </form>
+                    <div th:if="${post.user.id == user.id}">
+                        <button class="more-btn" onclick="toggleMoreOptions(this)">
+                            <img src="/image/plus.png" alt="더보기">
+                        </button>
+                        <div class="more-options">
+                            <a th:href="@{|/community/modify/${post.id}|}" class="btn" >수정</a>
+                            <form th:action="@{|/community/delete/${post.id}|}" method="post">
+                                <input type="submit" value="삭제" class="btn">
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <img th:src="@{|${post.postPhoto}|}" alt="Post Image" class="post-img">

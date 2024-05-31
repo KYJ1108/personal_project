@@ -25,9 +25,11 @@ public class CommunityController {
 
      //모든 게시물 조회
     @GetMapping("/list")
-    public String list(Model model, CommentForm commentForm) {
+    public String list(Model model, CommentForm commentForm,@AuthenticationPrincipal UserDetail userDetail) {
         List<Community> communities = communityService.getAllPosts(); // 게시물 목록을 가져오는 메서드
+        User user = userService.getUser(userDetail.getUsername());
         model.addAttribute("communities", communities); // 모델에 게시물 목록 추가
+        model.addAttribute("user",user);
         return "community_form"; // 컨트롤러에서 반환하는 뷰 이름
     }
 
