@@ -75,25 +75,25 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
         return new MySocialUser(sub, pass, name, email);
     }
 
-   public MySocialUser kakaoService(OAuth2User user){
-       String sub = user.getAttribute("id").toString();
-       String pass = "";
+    public MySocialUser kakaoService(OAuth2User user){
+        String sub = user.getAttribute("id").toString();
+        String pass = "";
 
-       Map<String, Object> kakaoAccount = user.getAttribute("kakao_account");
-       Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-       String name = (String) profile.get("nickname");
-       String email = (String) kakaoAccount.get("email");
+        Map<String, Object> kakaoAccount = user.getAttribute("kakao_account");
+        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+        String name = (String) profile.get("nickname");
+        String email = (String) kakaoAccount.get("email");
 
-       return new MySocialUser(sub, pass, name, email);
-   }
+        return new MySocialUser(sub, pass, name, email);
+    }
 
-   public MySocialUser naverService(OAuth2User user){
-       Map<String, Object> response = user.getAttribute("response");
-       String sub = response.get("id").toString();
-       String pass = "";
-       String name = response.get("name").toString();
-       String email = response.get("email").toString();
+    public MySocialUser naverService(OAuth2User user){
+        Map<String, Object> response = user.getAttribute("response");
+        String sub = response.get("id").toString();
+        String pass = "";
+        String name = response.get("name").toString();
+        String email = response.get("email").toString();
 
-       return new MySocialUser(sub, pass, name, email);
-   }
+        return new MySocialUser(sub, pass, name, email);
+    }
 }

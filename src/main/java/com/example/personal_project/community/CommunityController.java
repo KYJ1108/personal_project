@@ -23,13 +23,11 @@ public class CommunityController {
     private final CommunityService communityService;
     private final UserService userService;
 
-     //모든 게시물 조회
+    //모든 게시물 조회
     @GetMapping("/list")
-    public String list(Model model, CommentForm commentForm,@AuthenticationPrincipal UserDetail userDetail) {
+    public String list(Model model, CommentForm commentForm) {
         List<Community> communities = communityService.getAllPosts(); // 게시물 목록을 가져오는 메서드
-        User user = userService.getUser(userDetail.getUsername());
         model.addAttribute("communities", communities); // 모델에 게시물 목록 추가
-        model.addAttribute("user",user);
         return "community_form"; // 컨트롤러에서 반환하는 뷰 이름
     }
 
@@ -80,9 +78,9 @@ public class CommunityController {
     // 게시물 수정 처리
     @PostMapping("/modify/{id}")
     public String modify(@PathVariable("id") int id,
-                       @RequestParam("postImage") MultipartFile postImage,
-                       @RequestParam("postDescription") String postDescription,
-                       RedirectAttributes redirectAttributes) {
+                         @RequestParam("postImage") MultipartFile postImage,
+                         @RequestParam("postDescription") String postDescription,
+                         RedirectAttributes redirectAttributes) {
         // 게시물을 수정합니다.
         communityService.modifyCommunity(id, postImage, postDescription);
 

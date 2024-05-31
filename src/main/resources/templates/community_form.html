@@ -168,16 +168,14 @@
                         <img th:src="@{|${post.user.url != null ? post.user.url : '/pimg/user.png'}|}" alt="프로필 사진" class="profile-img">
                         <p th:text="${post.user.nickname}"></p> <!-- 사용자 nickname 출력 -->
                     </div>
-                    <div th:if="${post.user.id == user.id}">
-                        <button class="more-btn" onclick="toggleMoreOptions(this)">
-                            <img src="/image/plus.png" alt="더보기">
-                        </button>
-                        <div class="more-options">
-                            <a th:href="@{|/community/modify/${post.id}|}" class="btn" >수정</a>
-                            <form th:action="@{|/community/delete/${post.id}|}" method="post">
-                                <input type="submit" value="삭제" class="btn">
-                            </form>
-                        </div>
+                    <button class="more-btn" onclick="toggleMoreOptions(this)">
+                        <img src="/image/plus.png" alt="더보기">
+                    </button>
+                    <div class="more-options">
+                        <a th:href="@{|/community/modify/${post.id}|}" class="btn" >수정</a>
+                        <form th:action="@{|/community/delete/${post.id}|}" method="post">
+                            <input type="submit" value="삭제" class="btn">
+                        </form>
                     </div>
                 </div>
                 <img th:src="@{|${post.postPhoto}|}" alt="Post Image" class="post-img">

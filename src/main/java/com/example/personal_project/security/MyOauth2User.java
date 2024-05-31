@@ -13,7 +13,7 @@ import java.util.Map;
 @Setter
 public class MyOauth2User implements OAuth2User {
     private String name;
-    
+
     @Override
     public Map<String, Object> getAttributes() {
         return Map.of();
